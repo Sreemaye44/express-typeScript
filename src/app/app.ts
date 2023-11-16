@@ -13,7 +13,7 @@ const userRouter = express.Router();
 const courseRouter = express.Router();
 
 app.use("/api/v1/users", userRouter);
-app.use("/api/v1/courses", userRouter);
+app.use("/api/v1/courses", courseRouter);
 
 userRouter.post("/create-user", (req: Request, res: Response) => {
   const user = req.body;
@@ -49,19 +49,46 @@ app.get("/:userId/:subId", (req: Request, res: Response) => {
   console.log(req.params.userId);
   res.send("Hello WORLD in my!!!");
 });
-app.get("/", logger, (req: Request, res: Response) => {
-  //using params
-  console.log(req.query.email);
-  console.log(req.query.name);
+app.get(
+  "/",
+  logger,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      res.send(something);
+    } catch (error) {
+      next("error");
+    }
+    //using params
+    console.log(req.query.email);
+    console.log(req.query.name);
 
-  res.send("Hello WORLD in my!!!");
-});
+    res.send("Hello WORLD in my!!!");
+  }
+);
 
 app.post("/", (req: Request, res: Response) => {
   console.log(req.body);
   res.json({
     message: " successfully received data",
   });
+});
+
+app.all('*', (req, res)=>{
+  res.status(400).json({
+    success: false,
+    message: "Route Not found"
+  })
+})
+
+//global error handler
+
+app.use((error: any, req: Request, res: Response, next: NextFunction) => {
+  if (error) {
+    res.status(400).json({
+      success: false,
+      message: "something went wrong",
+    });
+  }
 });
 
 export default app;
